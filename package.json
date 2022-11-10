@@ -1,8 +1,17 @@
 {
-  "name": "tdd-mooc-new-js-project",
+  "name": "tdd-mooc-untestable-code",
   "version": "1.0.0-SNAPSHOT",
-  "description": "TODO",
-  "license": "TODO",
+  "description": "Exercise for learning unit testing",
+  "homepage": "https://github.com/luontola/tdd-mooc-untestable-code",
+  "author": {
+    "name": "Esko Luontola",
+    "url": "https://www.luontola.fi"
+  },
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/luontola/tdd-mooc-untestable-code.git"
+  },
   "private": true,
   "dependencies": {
     "lodash": "^4.17.15"
