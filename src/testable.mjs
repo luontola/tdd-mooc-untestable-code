@@ -1,12 +1,12 @@
-import { readFileSync } from "fs";
+import { readFile } from "fs/promises";
 import { parse } from "csv-parse/sync";
 
 // TODO: Singletons or global variables
 
 // File system: parse CSV
 
-export function readFile(path) {
-  return readFileSync(path).toString();
+export async function readUtf8File(path) {
+  return await readFile(path, { encoding: "utf8" });
 }
 
 export function parsePeopleCsv(csvData) {

@@ -4,12 +4,12 @@ import {
   diceHandValue,
   diceRoll,
   parsePeopleCsv,
-  readFile,
+  readUtf8File,
 } from "../src/testable.mjs";
 
 describe("File system: parse CSV file", () => {
-  it("read file", () => {
-    expect(readFile("./test/dummy.txt")).to.equal("dummy file\n");
+  it("read file", async () => {
+    expect(await readUtf8File("./test/dummy.txt")).to.equal("dummy file\n");
   });
 
   it("parse CSV", () => {
