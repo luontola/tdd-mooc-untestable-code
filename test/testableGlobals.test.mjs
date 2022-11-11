@@ -1,5 +1,10 @@
 import { expect } from "chai";
-import { PasswordService, UserDao } from "../src/testableGlobals.mjs";
+import {
+  hashPassword,
+  PasswordService,
+  UserDao,
+  verifyPassword,
+} from "../src/testableGlobals.mjs";
 
 describe("Globals and singletons: enterprise application", () => {
   const userId = 123;
@@ -11,20 +16,32 @@ describe("Globals and singletons: enterprise application", () => {
   });
 
   it("change password", () => {
-    users.save({ userId, password: "old-pw" });
+    const userBefore = {
+      userId,
+      passwordHash: hashPassword("old-pw"),
+    };
+    users.save(userBefore);
 
     service.changePassword(userId, "old-pw", "new-pw");
 
-    expect(users.getById(userId).password).to.equal("new-pw");
+    const userAfter = users.getById(userId);
+    expect(userAfter.passwordHash).to.not.equal(userBefore.passwordHash);
+    expect(verifyPassword(userAfter.passwordHash, "new-pw")).to.be.true;
   });
 
   it("old password did not match", () => {
-    users.save({ userId, password: "old-pw" });
+    const userBefore = {
+      userId,
+      passwordHash: hashPassword("old-pw"),
+    };
+    users.save(userBefore);
 
     expect(() => {
       service.changePassword(userId, "wrong-pw", "new-pw");
     }).to.throw(Error, "wrong old password");
 
-    expect(users.getById(userId).password).to.equal("old-pw");
+    const userAfter = users.getById(userId);
+    expect(userAfter.passwordHash).to.equal(userBefore.passwordHash);
+    expect(verifyPassword(userAfter.passwordHash, "old-pw")).to.be.true;
   });
 });
