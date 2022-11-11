@@ -1,4 +1,4 @@
-import { readFile } from "fs/promises";
+import { readFile } from "node:fs/promises";
 import { parse } from "csv-parse/sync";
 
 export async function readUtf8File(path) {

@@ -3,8 +3,14 @@ import {
   FakePasswordHasher,
   InMemoryUserDao,
   PasswordService,
+  PostgresUserDao,
   SecurePasswordHasher,
 } from "../src/testableGlobals.mjs";
+import util from "node:util";
+import child_process from "node:child_process";
+import pg from "pg";
+
+const exec = util.promisify(child_process.exec);
 
 describe("Globals and singletons: enterprise application", () => {
   const userId = 123;
@@ -74,6 +80,61 @@ describe("FakePasswordHasher", () => {
     expect(hasher.intToHex(0)).to.equal("00000000");
     expect(hasher.intToHex(1)).to.equal("00000001");
     expect(hasher.intToHex(-1)).to.equal("ffffffff");
+  });
+});
+
+async function dockerComposePort(service, privatePort) {
+  const result = await exec(`docker compose port ${service} ${privatePort}`);
+  const [host, port] = result.stdout.trim().split(":");
+  return { host, port };
+}
+
+async function dockerComposeEnv(service) {
+  const ps = await exec(`docker compose ps --quiet ${service}`);
+  const containerId = ps.stdout.trim();
+
+  const inspect = await exec(`docker inspect ${containerId}`);
+  const env = JSON.parse(inspect.stdout)[0].Config.Env;
+  return env
+    .map((s) => s.split("="))
+    .reduce((m, [k, v]) => {
+      m[k] = v;
+      return m;
+    }, {});
+}
+
+describe("PostgresUserDao", () => {
+  let db;
+  let dao;
+
+  before(async () => {
+    const service = "db";
+    const privatePort = "5432";
+    const { host, port } = await dockerComposePort(service, privatePort);
+    const env = await dockerComposeEnv(service);
+
+    const options = {
+      host,
+      port,
+      user: env.POSTGRES_USER,
+      password: env.POSTGRES_PASSWORD,
+      database: env.POSTGRES_USER,
+    };
+
+    db = new pg.Pool({
+      user: process.env.PGUSER,
+      host: process.env.PGHOST,
+      database: process.env.PGDATABASE,
+      password: process.env.PGPASSWORD,
+      port: process.env.PGPORT,
+      ...options,
+    });
+    dao = new PostgresUserDao(db);
+  });
+
+  it("spike", async () => {
+    const user = await dao.getById(666);
+    expect(user).to.equal(1);
   });
 });
 
