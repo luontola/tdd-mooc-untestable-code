@@ -1,24 +1,25 @@
 import { expect } from "chai";
 import {
-  hashPassword,
+  SecurePasswordHasher,
   PasswordService,
   UserDao,
-  verifyPassword,
 } from "../src/testableGlobals.mjs";
 
 describe("Globals and singletons: enterprise application", () => {
   const userId = 123;
   let users;
+  let hasher;
   let service;
   beforeEach(() => {
     users = new UserDao();
-    service = new PasswordService(users);
+    hasher = new SecurePasswordHasher();
+    service = new PasswordService(users, hasher);
   });
 
   it("change password", () => {
     const userBefore = {
       userId,
-      passwordHash: hashPassword("old-pw"),
+      passwordHash: hasher.hashPassword("old-pw"),
     };
     users.save(userBefore);
 
@@ -26,13 +27,13 @@ describe("Globals and singletons: enterprise application", () => {
 
     const userAfter = users.getById(userId);
     expect(userAfter.passwordHash).to.not.equal(userBefore.passwordHash);
-    expect(verifyPassword(userAfter.passwordHash, "new-pw")).to.be.true;
+    expect(hasher.verifyPassword(userAfter.passwordHash, "new-pw")).to.be.true;
   });
 
   it("old password did not match", () => {
     const userBefore = {
       userId,
-      passwordHash: hashPassword("old-pw"),
+      passwordHash: hasher.hashPassword("old-pw"),
     };
     users.save(userBefore);
 
@@ -42,6 +43,6 @@ describe("Globals and singletons: enterprise application", () => {
 
     const userAfter = users.getById(userId);
     expect(userAfter.passwordHash).to.equal(userBefore.passwordHash);
-    expect(verifyPassword(userAfter.passwordHash, "old-pw")).to.be.true;
+    expect(hasher.verifyPassword(userAfter.passwordHash, "old-pw")).to.be.true;
   });
 });
