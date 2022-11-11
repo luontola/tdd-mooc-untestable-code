@@ -11,7 +11,7 @@ export class PostgresUserDao {
     return rows[0].x;
   }
 
-  save(user) {}
+  async save(user) {}
 }
 
 function clone(obj) {
@@ -25,11 +25,11 @@ function clone(obj) {
 export class InMemoryUserDao {
   users = {};
 
-  getById(userId) {
+  async getById(userId) {
     return clone(this.users[userId]);
   }
 
-  save(user) {
+  async save(user) {
     this.users[user.userId] = clone(user);
   }
 }
@@ -64,12 +64,12 @@ export class PasswordService {
     this.hasher = hasher;
   }
 
-  changePassword(userId, oldPassword, newPassword) {
-    const user = this.users.getById(userId);
+  async changePassword(userId, oldPassword, newPassword) {
+    const user = await this.users.getById(userId);
     if (!this.hasher.verifyPassword(user.passwordHash, oldPassword)) {
       throw new Error("wrong old password");
     }
     user.passwordHash = this.hasher.hashPassword(newPassword);
-    this.users.save(user);
+    await this.users.save(user);
   }
 }
