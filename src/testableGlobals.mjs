@@ -1,4 +1,5 @@
 import argon2 from "@node-rs/argon2";
+import { crc32 } from "@node-rs/crc32";
 
 function clone(obj) {
   // TODO: could also use structuredClone, but it would require upgrading to Node.js 17.0
@@ -27,6 +28,16 @@ export class SecurePasswordHasher {
 
   verifyPassword(hash, password) {
     return argon2.verifySync(hash, password);
+  }
+}
+
+export class FakePasswordHasher {
+  hashPassword(password) {
+    return crc32(password);
+  }
+
+  verifyPassword(hash, password) {
+    return crc32(password) === hash;
   }
 }
 
