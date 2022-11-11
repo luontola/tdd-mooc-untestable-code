@@ -9,7 +9,7 @@ function clone(obj) {
   return null;
 }
 
-export class UserDao {
+export class InMemoryUserDao {
   users = {};
 
   getById(userId) {
