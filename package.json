@@ -33,7 +33,7 @@
     "parallel": true
   },
   "scripts": {
-    "test": "mocha --slow 10 'test/**/*.test.mjs'",
+    "test": "mocha",
     "autotest": "npm run test -- --watch",
     "format": "prettier --write ."
   }
