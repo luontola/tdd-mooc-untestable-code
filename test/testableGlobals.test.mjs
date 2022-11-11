@@ -103,33 +103,44 @@ async function dockerComposeEnv(service) {
     }, {});
 }
 
+async function connectTestDb() {
+  const service = "db";
+  const privatePort = "5432";
+  const { host, port } = await dockerComposePort(service, privatePort);
+  const env = await dockerComposeEnv(service);
+  return new pg.Pool({
+    host,
+    port,
+    user: env.POSTGRES_USER,
+    password: env.POSTGRES_PASSWORD,
+    database: env.POSTGRES_USER,
+  });
+}
+
+async function createTables(db) {
+  await db.query(`create table users
+                  (
+                      user_id       integer primary key,
+                      password_hash varchar(100) not null
+                  )`);
+}
+
+async function dropTables(db) {
+  await db.query(`drop table if exists users`);
+}
+
 describe("PostgresUserDao", () => {
   let db;
   let dao;
 
   before(async () => {
-    const service = "db";
-    const privatePort = "5432";
-    const { host, port } = await dockerComposePort(service, privatePort);
-    const env = await dockerComposeEnv(service);
-
-    const options = {
-      host,
-      port,
-      user: env.POSTGRES_USER,
-      password: env.POSTGRES_PASSWORD,
-      database: env.POSTGRES_USER,
-    };
-
-    db = new pg.Pool({
-      user: process.env.PGUSER,
-      host: process.env.PGHOST,
-      database: process.env.PGDATABASE,
-      password: process.env.PGPASSWORD,
-      port: process.env.PGPORT,
-      ...options,
-    });
+    db = await connectTestDb();
+    await createTables(db);
     dao = new PostgresUserDao(db);
+  });
+
+  after(async () => {
+    await dropTables(db);
   });
 
   it("spike", async () => {
