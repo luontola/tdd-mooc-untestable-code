@@ -23,32 +23,36 @@ describe("Globals and singletons: enterprise application", () => {
     service = new PasswordService(users, hasher);
   });
 
-  it("change password", () => {
+  it("change password", async () => {
     const userBefore = {
       userId,
       passwordHash: hasher.hashPassword("old-pw"),
     };
-    users.save(userBefore);
+    await users.save(userBefore);
 
-    service.changePassword(userId, "old-pw", "new-pw");
+    await service.changePassword(userId, "old-pw", "new-pw");
 
-    const userAfter = users.getById(userId);
+    const userAfter = await users.getById(userId);
     expect(userAfter.passwordHash).to.not.equal(userBefore.passwordHash);
     expect(hasher.verifyPassword(userAfter.passwordHash, "new-pw")).to.be.true;
   });
 
-  it("old password did not match", () => {
+  it("old password did not match", async () => {
     const userBefore = {
       userId,
       passwordHash: hasher.hashPassword("old-pw"),
     };
-    users.save(userBefore);
+    await users.save(userBefore);
 
-    expect(() => {
-      service.changePassword(userId, "wrong-pw", "new-pw");
-    }).to.throw(Error, "wrong old password");
+    let error;
+    try {
+      await service.changePassword(userId, "wrong-pw", "new-pw");
+    } catch (e) {
+      error = e;
+    }
+    expect(error).to.deep.equal(new Error("wrong old password"));
 
-    const userAfter = users.getById(userId);
+    const userAfter = await users.getById(userId);
     expect(userAfter.passwordHash).to.equal(userBefore.passwordHash);
     expect(hasher.verifyPassword(userAfter.passwordHash, "old-pw")).to.be.true;
   });
@@ -152,7 +156,7 @@ describe("PostgresUserDao", () => {
 describe("InMemoryUserDao", () => {
   const dao = new InMemoryUserDao();
 
-  it("get user by ID", () => {
+  it("get user by ID", async () => {
     const user1a = {
       userId: 100,
       passwordHash: "abc",
@@ -161,29 +165,29 @@ describe("InMemoryUserDao", () => {
       userId: 200,
       passwordHash: "xyz",
     };
-    dao.save(user1a);
-    dao.save(user2a);
+    await dao.save(user1a);
+    await dao.save(user2a);
 
-    const user1b = dao.getById(user1a.userId);
-    const user2b = dao.getById(user2a.userId);
+    const user1b = await dao.getById(user1a.userId);
+    const user2b = await dao.getById(user2a.userId);
     expect(user1b).to.deep.equal(user1a, "get user1 by ID");
     expect(user2b).to.deep.equal(user2a, "get user2 by ID");
     expect(user1b).to.not.equal(user1a, "makes defensive copies");
-    expect(dao.getById(666)).to.equal(null, "non-existing ID");
+    expect(await dao.getById(666)).to.equal(null, "non-existing ID");
   });
 
-  it("create and update user", () => {
+  it("create and update user", async () => {
     const user = {
       userId: 100,
       passwordHash: "abc",
     };
-    dao.save(user);
-    expect(dao.getById(user.userId)).to.deep.equal(user, "after create");
+    await dao.save(user);
+    expect(await dao.getById(user.userId)).to.deep.equal(user, "after create");
 
     user.passwordHash = "xyz";
 
-    expect(dao.getById(user.userId)).to.not.deep.equal(user, "before update");
-    dao.save(user);
-    expect(dao.getById(user.userId)).to.deep.equal(user, "after update");
+    expect(await dao.getById(user.userId)).to.not.deep.equal(user, "before update");
+    await dao.save(user);
+    expect(await dao.getById(user.userId)).to.deep.equal(user, "after update");
   });
 });
