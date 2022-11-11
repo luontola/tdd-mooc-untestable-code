@@ -1,9 +1,9 @@
 import { expect } from "chai";
 import {
   FakePasswordHasher,
+  InMemoryUserDao,
   PasswordService,
   SecurePasswordHasher,
-  UserDao,
 } from "../src/testableGlobals.mjs";
 
 describe("Globals and singletons: enterprise application", () => {
@@ -12,7 +12,7 @@ describe("Globals and singletons: enterprise application", () => {
   let hasher;
   let service;
   beforeEach(() => {
-    users = new UserDao();
+    users = new InMemoryUserDao();
     hasher = new FakePasswordHasher();
     service = new PasswordService(users, hasher);
   });
@@ -74,5 +74,44 @@ describe("FakePasswordHasher", () => {
     expect(hasher.intToHex(0)).to.equal("00000000");
     expect(hasher.intToHex(1)).to.equal("00000001");
     expect(hasher.intToHex(-1)).to.equal("ffffffff");
+  });
+});
+
+describe("InMemoryUserDao", () => {
+  const dao = new InMemoryUserDao();
+
+  it("get user by ID", () => {
+    const user1a = {
+      userId: 100,
+      passwordHash: "abc",
+    };
+    const user2a = {
+      userId: 200,
+      passwordHash: "xyz",
+    };
+    dao.save(user1a);
+    dao.save(user2a);
+
+    const user1b = dao.getById(user1a.userId);
+    const user2b = dao.getById(user2a.userId);
+    expect(user1b).to.deep.equal(user1a, "get user1 by ID");
+    expect(user2b).to.deep.equal(user2a, "get user2 by ID");
+    expect(user1b).to.not.equal(user1a, "makes defensive copies");
+    expect(dao.getById(666)).to.equal(null, "non-existing ID");
+  });
+
+  it("create and update user", () => {
+    const user = {
+      userId: 100,
+      passwordHash: "abc",
+    };
+    dao.save(user);
+    expect(dao.getById(user.userId)).to.deep.equal(user, "after create");
+
+    user.passwordHash = "xyz";
+
+    expect(dao.getById(user.userId)).to.not.deep.equal(user, "before update");
+    dao.save(user);
+    expect(dao.getById(user.userId)).to.deep.equal(user, "after update");
   });
 });
