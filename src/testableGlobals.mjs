@@ -32,12 +32,16 @@ export class SecurePasswordHasher {
 }
 
 export class FakePasswordHasher {
+  intToHex(n) {
+    return (n >>> 0).toString(16).padStart(8, "0");
+  }
+
   hashPassword(password) {
-    return crc32(password);
+    return this.intToHex(crc32(password));
   }
 
   verifyPassword(hash, password) {
-    return crc32(password) === hash;
+    return this.hashPassword(password) === hash;
   }
 }
 
