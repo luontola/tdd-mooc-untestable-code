@@ -48,18 +48,31 @@ describe("Globals and singletons: enterprise application", () => {
   });
 });
 
-[
-  ["SecurePasswordHasher", new SecurePasswordHasher()],
-  ["FakePasswordHasher", new FakePasswordHasher()],
-].forEach(([fixtureName, hasher]) => {
-  describe(fixtureName, () => {
-    const hash = hasher.hashPassword("correct");
+function passwordHasherContract(hasher) {
+  const hash = hasher.hashPassword("correct");
 
-    it("correct password", () => {
-      expect(hasher.verifyPassword(hash, "correct")).to.be.true;
-    });
-    it("wrong password", () => {
-      expect(hasher.verifyPassword(hash, "wrong")).to.be.false;
-    });
+  it("correct password", () => {
+    expect(hasher.verifyPassword(hash, "correct")).to.be.true;
+  });
+
+  it("wrong password", () => {
+    expect(hasher.verifyPassword(hash, "wrong")).to.be.false;
+  });
+}
+
+describe("SecurePasswordHasher", () => {
+  const hasher = new SecurePasswordHasher();
+  passwordHasherContract(hasher);
+});
+
+describe("FakePasswordHasher", () => {
+  const hasher = new FakePasswordHasher();
+  passwordHasherContract(hasher);
+
+  it("hash format", () => {
+    expect(hasher.hashPassword("abc")).to.equal("352441c2");
+    expect(hasher.intToHex(0)).to.equal("00000000");
+    expect(hasher.intToHex(1)).to.equal("00000001");
+    expect(hasher.intToHex(-1)).to.equal("ffffffff");
   });
 });
