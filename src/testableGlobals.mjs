@@ -1,3 +1,5 @@
+import argon2 from "@node-rs/argon2";
+
 function clone(obj) {
   // TODO: could also use structuredClone, but it would require upgrading to Node.js 17.0
   if (obj) {
@@ -18,6 +20,14 @@ export class UserDao {
   }
 }
 
+export function hashPassword(password) {
+  return argon2.hashSync(password);
+}
+
+export function verifyPassword(hash, password) {
+  return argon2.verifySync(hash, password);
+}
+
 export class PasswordService {
   constructor(users) {
     this.users = users;
@@ -25,13 +35,10 @@ export class PasswordService {
 
   changePassword(userId, oldPassword, newPassword) {
     const user = this.users.getById(userId);
-    // This is code isn't meant to be secure. Always store passwords using bcrypt or similar algorithm
-    // which is designed for passwords. See https://auth0.com/blog/hashing-passwords-one-way-road-to-security/
-    if (oldPassword !== user.password) {
+    if (!verifyPassword(user.passwordHash, oldPassword)) {
       throw new Error("wrong old password");
-    } else {
-      user.password = newPassword;
     }
+    user.passwordHash = hashPassword(newPassword);
     this.users.save(user);
   }
 }
