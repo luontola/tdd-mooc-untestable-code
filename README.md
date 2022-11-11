@@ -15,6 +15,14 @@ You'll need a recent [Node.js](https://nodejs.org/) version. Then download this 
 
 ## Developing
 
+Start the database
+
+    docker compose up -d
+
+Stop and destroy the database
+
+    docker compose down
+
 Run tests once
 
     npm run test
