@@ -110,6 +110,7 @@ async function dockerComposeEnv(service) {
 async function connectTestDb() {
   const service = "db";
   const privatePort = "5432";
+  // supports dynamic port mapping on the host à la "127.0.0.1::5432"
   const { host, port } = await dockerComposePort(service, privatePort);
   const env = await dockerComposeEnv(service);
   return new pg.Pool({
