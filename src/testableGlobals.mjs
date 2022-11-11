@@ -1,6 +1,19 @@
 import argon2 from "@node-rs/argon2";
 import { crc32 } from "@node-rs/crc32";
 
+export class PostgresUserDao {
+  constructor(db) {
+    this.db = db;
+  }
+
+  async getById(userId) {
+    const { rows } = await this.db.query("select 1 as x");
+    return rows[0].x;
+  }
+
+  save(user) {}
+}
+
 function clone(obj) {
   // TODO: could also use structuredClone, but it would require upgrading to Node.js 17.0
   if (obj) {
