@@ -20,25 +20,28 @@ export class UserDao {
   }
 }
 
-export function hashPassword(password) {
-  return argon2.hashSync(password);
-}
+export class SecurePasswordHasher {
+  hashPassword(password) {
+    return argon2.hashSync(password);
+  }
 
-export function verifyPassword(hash, password) {
-  return argon2.verifySync(hash, password);
+  verifyPassword(hash, password) {
+    return argon2.verifySync(hash, password);
+  }
 }
 
 export class PasswordService {
-  constructor(users) {
+  constructor(users, hasher) {
     this.users = users;
+    this.hasher = hasher;
   }
 
   changePassword(userId, oldPassword, newPassword) {
     const user = this.users.getById(userId);
-    if (!verifyPassword(user.passwordHash, oldPassword)) {
+    if (!this.hasher.verifyPassword(user.passwordHash, oldPassword)) {
       throw new Error("wrong old password");
     }
-    user.passwordHash = hashPassword(newPassword);
+    user.passwordHash = this.hasher.hashPassword(newPassword);
     this.users.save(user);
   }
 }
