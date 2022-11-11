@@ -58,7 +58,7 @@ describe("Globals and singletons: enterprise application", () => {
   });
 });
 
-function passwordHasherContract(hasher) {
+function PasswordHasherContract(hasher) {
   const hash = hasher.hashPassword("correct");
 
   it("correct password", () => {
@@ -72,12 +72,12 @@ function passwordHasherContract(hasher) {
 
 describe("SecurePasswordHasher", () => {
   const hasher = new SecurePasswordHasher();
-  passwordHasherContract(hasher);
+  PasswordHasherContract(hasher);
 });
 
 describe("FakePasswordHasher", () => {
   const hasher = new FakePasswordHasher();
-  passwordHasherContract(hasher);
+  PasswordHasherContract(hasher);
 
   it("hash format", () => {
     expect(hasher.hashPassword("abc")).to.equal("352441c2");
@@ -133,28 +133,11 @@ async function dropTables(db) {
   await db.query(`drop table if exists users`);
 }
 
-describe("PostgresUserDao", () => {
-  let db;
+function UserDaoContract(daoProvider) {
   let dao;
-
-  before(async () => {
-    db = await connectTestDb();
-    await createTables(db);
-    dao = new PostgresUserDao(db);
+  beforeEach(() => {
+    dao = daoProvider();
   });
-
-  after(async () => {
-    await dropTables(db);
-  });
-
-  it("spike", async () => {
-    const user = await dao.getById(666);
-    expect(user).to.equal(1);
-  });
-});
-
-describe("InMemoryUserDao", () => {
-  const dao = new InMemoryUserDao();
 
   it("get user by ID", async () => {
     const user1a = {
@@ -190,4 +173,27 @@ describe("InMemoryUserDao", () => {
     await dao.save(user);
     expect(await dao.getById(user.userId)).to.deep.equal(user, "after update");
   });
+}
+
+describe("PostgresUserDao", async () => {
+  let db;
+  let dao;
+
+  before(async () => {
+    db = await connectTestDb();
+    await dropTables(db);
+    await createTables(db);
+    dao = new PostgresUserDao(db);
+  });
+
+  after(async () => {
+    await db.end();
+  });
+
+  UserDaoContract(() => dao);
+});
+
+describe("InMemoryUserDao", () => {
+  const dao = new InMemoryUserDao();
+  UserDaoContract(() => dao);
 });
