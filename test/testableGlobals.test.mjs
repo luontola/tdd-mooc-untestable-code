@@ -1,7 +1,8 @@
 import { expect } from "chai";
 import {
-  SecurePasswordHasher,
+  FakePasswordHasher,
   PasswordService,
+  SecurePasswordHasher,
   UserDao,
 } from "../src/testableGlobals.mjs";
 
@@ -12,7 +13,7 @@ describe("Globals and singletons: enterprise application", () => {
   let service;
   beforeEach(() => {
     users = new UserDao();
-    hasher = new SecurePasswordHasher();
+    hasher = new FakePasswordHasher();
     service = new PasswordService(users, hasher);
   });
 
@@ -44,5 +45,21 @@ describe("Globals and singletons: enterprise application", () => {
     const userAfter = users.getById(userId);
     expect(userAfter.passwordHash).to.equal(userBefore.passwordHash);
     expect(hasher.verifyPassword(userAfter.passwordHash, "old-pw")).to.be.true;
+  });
+});
+
+[
+  ["SecurePasswordHasher", new SecurePasswordHasher()],
+  ["FakePasswordHasher", new FakePasswordHasher()],
+].forEach(([fixtureName, hasher]) => {
+  describe(fixtureName, () => {
+    const hash = hasher.hashPassword("correct");
+
+    it("correct password", () => {
+      expect(hasher.verifyPassword(hash, "correct")).to.be.true;
+    });
+    it("wrong password", () => {
+      expect(hasher.verifyPassword(hash, "wrong")).to.be.false;
+    });
   });
 });
