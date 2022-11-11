@@ -134,6 +134,7 @@ async function dropTables(db) {
 }
 
 function UserDaoContract(daoProvider) {
+  let userIdSeq = 100;
   let dao;
   beforeEach(() => {
     dao = daoProvider();
@@ -141,11 +142,11 @@ function UserDaoContract(daoProvider) {
 
   it("get user by ID", async () => {
     const user1a = {
-      userId: 100,
+      userId: ++userIdSeq,
       passwordHash: "abc",
     };
     const user2a = {
-      userId: 200,
+      userId: ++userIdSeq,
       passwordHash: "xyz",
     };
     await dao.save(user1a);
@@ -161,7 +162,7 @@ function UserDaoContract(daoProvider) {
 
   it("create and update user", async () => {
     const user = {
-      userId: 100,
+      userId: ++userIdSeq,
       passwordHash: "abc",
     };
     await dao.save(user);
