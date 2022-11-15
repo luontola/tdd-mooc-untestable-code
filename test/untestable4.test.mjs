@@ -1,4 +1,4 @@
-import { PasswordService } from "../src/untestable4.mjs";
+import { PasswordService, PostgresUserDao } from "../src/untestable4.mjs";
 
 describe("Untestable 4: enterprise application", () => {
   let service;
@@ -7,7 +7,7 @@ describe("Untestable 4: enterprise application", () => {
   });
 
   afterEach(() => {
-    service.close();
+    PostgresUserDao.getInstance().close();
   });
 
   it("todo", async () => {

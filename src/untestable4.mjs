@@ -2,6 +2,15 @@ import argon2 from "@node-rs/argon2";
 import pg from "pg";
 
 export class PostgresUserDao {
+  static instance;
+
+  static getInstance() {
+    if (!this.instance) {
+      this.instance = new PostgresUserDao();
+    }
+    return this.instance;
+  }
+
   db = new pg.Pool({
     user: process.env.PGUSER,
     host: process.env.PGHOST,
@@ -40,11 +49,7 @@ export class PostgresUserDao {
 }
 
 export class PasswordService {
-  users = new PostgresUserDao();
-
-  close() {
-    this.users.close();
-  }
+  users = PostgresUserDao.getInstance();
 
   async changePassword(userId, oldPassword, newPassword) {
     const user = await this.users.getById(userId);
