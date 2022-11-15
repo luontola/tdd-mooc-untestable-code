@@ -6,7 +6,7 @@ import { parsePeopleCsv } from "../src/untestable3.mjs";
 // Anya,Forger,6,Female
 // Yor,Forger,27,Female
 
-describe("Untestable 3: parse CSV file", () => {
+describe("Untestable 3: CSV file parsing", () => {
   it("todo", async () => {
     // TODO: write proper tests
     try {
