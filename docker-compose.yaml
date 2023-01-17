@@ -5,6 +5,8 @@ services:
     environment:
       POSTGRES_USER: untestable
       POSTGRES_PASSWORD: secret
+    volumes:
+      - "./src/create-tables.sql:/docker-entrypoint-initdb.d/create-tables.sql:ro"
     mem_reservation: 100m
     mem_limit: 200m
     ports:
