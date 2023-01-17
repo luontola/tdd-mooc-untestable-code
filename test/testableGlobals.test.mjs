@@ -9,6 +9,7 @@ import {
 import util from "node:util";
 import child_process from "node:child_process";
 import pg from "pg";
+import { readFileSync } from "fs";
 
 const exec = util.promisify(child_process.exec);
 
@@ -123,15 +124,15 @@ async function connectTestDb() {
 }
 
 async function createTables(db) {
-  await db.query(`create table users
-                  (
-                      user_id       integer primary key,
-                      password_hash varchar(100) not null
-                  )`);
+  await db.query(readFileSync("./src/create-tables.sql", { encoding: "utf8", flag: "r" }));
 }
 
 async function dropTables(db) {
-  await db.query(`drop table if exists users`);
+  await db.query(readFileSync("./src/drop-tables.sql", { encoding: "utf8", flag: "r" }));
+}
+
+async function truncateTables(db) {
+  await db.query("truncate users");
 }
 
 function UserDaoContract(daoProvider) {
@@ -183,8 +184,14 @@ describe("PostgresUserDao", async () => {
 
   before(async () => {
     db = await connectTestDb();
-    await dropTables(db);
-    await createTables(db);
+    if (true) {
+      // option 1: recreate tables between tests
+      await dropTables(db);
+      await createTables(db);
+    } else {
+      // option 2: assume tables exist and just empty them between tests
+      await truncateTables(db);
+    }
     dao = new PostgresUserDao(db);
   });
 
