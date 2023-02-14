@@ -11,6 +11,6 @@ describe("Untestable 4: enterprise application", () => {
   });
 
   it("todo", async () => {
-    // TODO: write proper tests
+    // TODO: write proper tests for both PasswordService and PostgresUserDao
   });
 });
