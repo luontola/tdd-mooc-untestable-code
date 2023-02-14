@@ -31,6 +31,16 @@ Start the database
 
     docker compose up -d
 
+This will start a [PostgreSQL 13](https://www.postgresql.org/docs/13/index.html) database to which you can connect using
+the following settings:
+
+- Host: `localhost`
+- Port: `5432`
+- User: `untestable`
+- Password: `secret`
+- Database: `untestable`
+- It will also create a `users` table in the `public` schema based on [src/create-tables.sql](src/create-tables.sql)
+
 Stop and destroy the database
 
     docker compose down
