@@ -27,7 +27,7 @@ You'll need a recent [Node.js](https://nodejs.org/) version. Then download this 
 
 ## Developing
 
-Start the database
+Start the database (used by untestable4)
 
     docker compose up -d
 
