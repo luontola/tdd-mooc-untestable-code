@@ -23,7 +23,7 @@ export class PostgresUserDao {
     this.db.end();
   }
 
-  rowToUser(row) {
+  #rowToUser(row) {
     return { userId: row.user_id, passwordHash: row.password_hash };
   }
 
@@ -34,7 +34,7 @@ export class PostgresUserDao {
        where user_id = $1`,
       [userId]
     );
-    return rows.map(this.rowToUser)[0] || null;
+    return rows.map(this.#rowToUser)[0] || null;
   }
 
   async save(user) {
