@@ -26,6 +26,9 @@ You'll need a recent [Node.js](https://nodejs.org/) version. Then download this 
 
     npm install
 
+Part 4 of this exercise provides [Docker](https://www.docker.com/products/docker-desktop/) configuration for starting
+the database, but you may also run [PostgreSQL](https://www.postgresql.org/download/) without containers.
+
 ## Developing
 
 Start the database (used by untestable4)
