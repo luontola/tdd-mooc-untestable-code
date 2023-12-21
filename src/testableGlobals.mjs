@@ -31,23 +31,15 @@ export class PostgresUserDao {
   }
 }
 
-function clone(obj) {
-  // TODO: could also use structuredClone, but it would require upgrading to Node.js 17.0
-  if (obj) {
-    return { ...obj };
-  }
-  return null;
-}
-
 export class InMemoryUserDao {
   users = {};
 
   async getById(userId) {
-    return clone(this.users[userId]);
+    return structuredClone(this.users[userId]) || null;
   }
 
   async save(user) {
-    this.users[user.userId] = clone(user);
+    this.users[user.userId] = structuredClone(user);
   }
 }
 
