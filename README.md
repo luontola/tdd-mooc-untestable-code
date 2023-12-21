@@ -12,7 +12,8 @@ Write your learnings as comments in the untestable code.
 
 **Then create a copy of the untestable code, refactor it to be easily testable, and write tests for it.**
 
-P.S. If you want an extra challenge, also write tests for the original untestable code without refactoring it.
+P.S. If you want an extra challenge, also write tests for the original untestable code. Then compare the tests you wrote
+for the refactored code and the original code, and see how much more complicated they are.
 
 ---
 
@@ -24,6 +25,9 @@ by [Esko Luontola](https://twitter.com/EskoLuontola) and [Nitor](https://nitor.c
 You'll need a recent [Node.js](https://nodejs.org/) version. Then download this project's dependencies with:
 
     npm install
+
+Part 4 of this exercise provides [Docker](https://www.docker.com/products/docker-desktop/) configuration for starting
+the database, but you may also run [PostgreSQL](https://www.postgresql.org/download/) without containers.
 
 ## Developing
 

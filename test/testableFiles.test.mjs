@@ -1,12 +1,13 @@
+import { describe, test } from "vitest";
 import { expect } from "chai";
 import { parsePeopleCsv, readUtf8File } from "../src/testableFiles.mjs";
 
 describe("File system: CSV file parsing", () => {
-  it("read file", async () => {
+  test("read file", async () => {
     expect(await readUtf8File("./test/dummy.txt")).to.equal("dummy file\n");
   });
 
-  it("parse CSV", () => {
+  test("parse CSV", () => {
     const input = `
       Loid,Forger,,Male
       Anya,Forger,6,Female

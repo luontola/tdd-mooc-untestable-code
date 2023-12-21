@@ -1,3 +1,4 @@
+import { afterAll, beforeAll, beforeEach, describe, test } from "vitest";
 import { expect } from "chai";
 import {
   FakePasswordHasher,
@@ -24,7 +25,7 @@ describe("Globals and singletons: enterprise application", () => {
     service = new PasswordService(users, hasher);
   });
 
-  it("change password", async () => {
+  test("change password", async () => {
     const userBefore = {
       userId,
       passwordHash: hasher.hashPassword("old-pw"),
@@ -38,7 +39,7 @@ describe("Globals and singletons: enterprise application", () => {
     expect(hasher.verifyPassword(userAfter.passwordHash, "new-pw")).to.be.true;
   });
 
-  it("old password did not match", async () => {
+  test("old password did not match", async () => {
     const userBefore = {
       userId,
       passwordHash: hasher.hashPassword("old-pw"),
@@ -62,11 +63,11 @@ describe("Globals and singletons: enterprise application", () => {
 function PasswordHasherContract(hasher) {
   const hash = hasher.hashPassword("correct");
 
-  it("correct password", () => {
+  test("correct password", () => {
     expect(hasher.verifyPassword(hash, "correct")).to.be.true;
   });
 
-  it("wrong password", () => {
+  test("wrong password", () => {
     expect(hasher.verifyPassword(hash, "wrong")).to.be.false;
   });
 }
@@ -80,7 +81,7 @@ describe("FakePasswordHasher", () => {
   const hasher = new FakePasswordHasher();
   PasswordHasherContract(hasher);
 
-  it("hash format", () => {
+  test("hash format", () => {
     expect(hasher.hashPassword("abc")).to.equal("352441c2");
     expect(hasher.intToHex(0)).to.equal("00000000");
     expect(hasher.intToHex(1)).to.equal("00000001");
@@ -142,7 +143,7 @@ function UserDaoContract(daoProvider) {
     dao = daoProvider();
   });
 
-  it("get user by ID", async () => {
+  test("get user by ID", async () => {
     const user1a = {
       userId: ++userIdSeq,
       passwordHash: "abc",
@@ -162,7 +163,7 @@ function UserDaoContract(daoProvider) {
     expect(await dao.getById(666)).to.equal(null, "non-existing ID");
   });
 
-  it("create and update user", async () => {
+  test("create and update user", async () => {
     const user = {
       userId: ++userIdSeq,
       passwordHash: "abc",
@@ -182,7 +183,7 @@ describe("PostgresUserDao", async () => {
   let db;
   let dao;
 
-  before(async () => {
+  beforeAll(async () => {
     db = await connectTestDb();
     if (true) {
       // option 1: recreate tables between tests
@@ -195,7 +196,7 @@ describe("PostgresUserDao", async () => {
     dao = new PostgresUserDao(db);
   });
 
-  after(async () => {
+  afterAll(async () => {
     await db.end();
   });
 
