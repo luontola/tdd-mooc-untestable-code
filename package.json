@@ -22,19 +22,17 @@
   },
   "devDependencies": {
     "chai": "^4.3.7",
-    "mocha": "^10.1.0",
-    "prettier": "^2.7.1"
+    "prettier": "^2.7.1",
+    "vite": "^5.0.10",
+    "vitest": "^1.1.0"
   },
   "engines": {
     "node": ">=16",
     "npm": ">=7"
   },
-  "mocha": {
-    "parallel": true
-  },
   "scripts": {
-    "test": "mocha",
-    "autotest": "npm run test -- --watch",
+    "test": "vitest run",
+    "autotest": "vitest watch",
     "format": "prettier --write ."
   }
 }

@@ -1,3 +1,4 @@
+import { describe, test } from "vitest";
 import { expect } from "chai";
 import { parsePeopleCsv } from "../src/untestable3.mjs";
 
@@ -7,7 +8,7 @@ import { parsePeopleCsv } from "../src/untestable3.mjs";
 // Yor,Forger,27,Female
 
 describe("Untestable 3: CSV file parsing", () => {
-  it("todo", async () => {
+  test("todo", async () => {
     // TODO: write proper tests
     try {
       expect(await parsePeopleCsv("people.csv")).to.deep.equal([]);
