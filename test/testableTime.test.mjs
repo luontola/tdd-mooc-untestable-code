@@ -2,6 +2,9 @@ import { describe, test } from "vitest";
 import { expect } from "chai";
 import { daysUntilChristmas } from "../src/testableTime.mjs";
 
+// There are multiple edge cases that are worth testing. For example the start and end
+// of each day, and the day after Christmas when it starts counting to the next year.
+
 describe("Time: days until Christmas", () => {
   test("Christmas Day", () => {
     expect(daysUntilChristmas(new Date("2022-12-25T00:00:00"))).to.equal(0);
